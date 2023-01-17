@@ -15,7 +15,7 @@
 </head>
 <body>
     <!--Inici-->
-
+        
     <!--Botons d'opcions per seleccionar si fa de servidor o de client-->
     <button name="servidor" title="servidor" id="accedirwebservidor"></button>
     <button name="client" title="client" id="accedirwebclient"></button>
