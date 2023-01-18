@@ -70,7 +70,8 @@ Nau.prototype.moure = function () {
     }
     this.nau.setAttributeNS(null, 'x', this.x);
     this.nau.setAttributeNS(null, 'y', this.y);
-    this.nau.setAttributeNS(null, 'transform', 'rotate(' + this.rotacio + ' ' + this.x + ' ' + this.y + ')');
+    // this.nau.setAttributeNS(null, 'transform', 'rotate(' + this.rotacio + ' ' + this.x + ' ' + this.y + ')');
+    this.nau.setAttributeNS(null, 'transform', 'rotate(' + this.rotacio + ' ' + (this.x + 20) + ' ' + (this.y + 20) + ')');
 }
 
 Nau.prototype.keydown = function (e) {

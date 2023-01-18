@@ -12,7 +12,7 @@
 <body>
     <!-- Mostrar SVG per afegir els elements pel joc -->
     <div>
-        <svg id="joc" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480px" height="600px" style="border: 1px; border-style: solid;">
+        <svg id="joc" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480px" height="600px" style="border: 1px; border-style: solid;" viewbox: 0 0 480 600>
 
         </svg>
     </div>
