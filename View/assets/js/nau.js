@@ -10,8 +10,7 @@ export function Nau(njugador) {
         right: false,
         up: false,
         down: false
-    };
-    //poner posicion random a la nave sin tonacar los bordes    
+    };  
     this.x = Math.floor(Math.random() * 440);
     this.y = Math.floor(Math.random() * 560);
     this.rotacio = Math.floor(Math.random() * 360);
@@ -53,11 +52,13 @@ Nau.prototype.eventListeners = function () {
 }
 
 Nau.prototype.moure = function () {
+    let comprovamoviment = false;
     if (this.controls.left && this.controls.up){
         if (this.x > 0 && this.y > 0){
             this.x -= 1.5;
             this.y -= 1.5;
             this.rotacio = 315;
+            comprovamoviment = true;
         } else{
             this.rotacio = 315;
         }
@@ -66,6 +67,7 @@ Nau.prototype.moure = function () {
             this.x -= 1.5;
             this.y += 1.5;
             this.rotacio = 225;
+            comprovamoviment = true;
         } else{
             this.rotacio = 225;
         }
@@ -74,6 +76,7 @@ Nau.prototype.moure = function () {
             this.x += 1.5;
             this.y -= 1.5;
             this.rotacio = 45;
+            comprovamoviment = true;
         } else {
             this.rotacio = 45;
         }
@@ -82,6 +85,7 @@ Nau.prototype.moure = function () {
             this.x += 1.5;
             this.y += 1.5;
             this.rotacio = 135;
+            comprovamoviment = true;
         } else {
             this.rotacio = 135;
         }
@@ -90,6 +94,7 @@ Nau.prototype.moure = function () {
         if(this.x > 0){
             this.x -= 2;
             this.rotacio = 270;
+            comprovamoviment = true;
         } else {
             this.rotacio = 270;
         }
@@ -97,6 +102,7 @@ Nau.prototype.moure = function () {
         if(this.x < this.limitx){
             this.x += 2;
             this.rotacio = 90;
+            comprovamoviment = true;
         } else {
             this.rotacio = 90;
         }
@@ -104,6 +110,7 @@ Nau.prototype.moure = function () {
         if(this.y > 0){
             this.y -= 2;
             this.rotacio = 0;
+            comprovamoviment = true;
         } else{
             this.rotacio = 0;
         }
@@ -111,6 +118,7 @@ Nau.prototype.moure = function () {
         if(this.y < this.limity){
         this.y += 2;
         this.rotacio = 180;
+        comprovamoviment = true;
         }
         else {
             this.rotacio = 180;
@@ -120,7 +128,8 @@ Nau.prototype.moure = function () {
     this.nau.setAttributeNS(null, 'y', this.y);
     // this.nau.setAttributeNS(null, 'transform', 'rotate(' + this.rotacio + ' ' + this.x + ' ' + this.y + ')');
     this.nau.setAttributeNS(null, 'transform', 'rotate(' + this.rotacio + ' ' + (this.x + 20) + ' ' + (this.y + 20) + ')');
-    } 
+    return comprovamoviment;    
+} 
 
 Nau.prototype.keydown = function (e) {
     switch (e.keyCode) {

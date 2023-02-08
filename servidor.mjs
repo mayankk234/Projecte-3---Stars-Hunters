@@ -34,7 +34,7 @@ wsServer.on("connection", (client, peticio) => {
             if (jugadors.length <= 6) {
                 //S'ha de comprovar quin numero de jugador esta lliure
                 if (!jugadors[0]) {
-                    if (actualitzarPosicions == undefined) actualitzarPosicions = setInterval(actPos, 1000 / 60);
+                    // if (actualitzarPosicions == undefined) actualitzarPosicions = setInterval(actPos, 1000 / 60);
                     client.send("1");
                     jugadors[0] = true;
                     jugador[0] = id;
@@ -69,6 +69,7 @@ wsServer.on("connection", (client, peticio) => {
             if (index > -1) {
                 naus[index] = nau;
             }
+            actPos();
         }
         console.log("Missatge rebut: " + missatge);
         console.log("Jugadors: " + jugadors);});

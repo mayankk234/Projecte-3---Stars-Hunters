@@ -16,6 +16,8 @@ function init(){
     else domini = window.location.hostname;
     var url = "ws://" + domini + ":8180";
     let connexio = new WebSocket(url);
+    var xprevi = 0;
+    var yprevi = 0;
 
     
     
@@ -28,9 +30,9 @@ function init(){
             nau = new Nau(missatge.data);
             nausjugadors[nau.njugador - 1] = nau;
             mourenau = setInterval(function () {
-                nau.moure();
-                connexio.send(JSON.stringify(nau));
-        
+                if (nau.moure()) {
+                    connexio.send(JSON.stringify(nau));
+                }         
             }, 1000 / 60);
             console.log("Jugador " + missatge.data);
             connexio.send(JSON.stringify(nau));
@@ -59,15 +61,31 @@ $(document).ready(function() {
 });
 
 function actualitzarposicions(){
-    for (let i = 0; i < nausjugadors.length; i++) {
-        if (nausjugadors[i].njugador != nau.njugador) {
-            if (nausjugadors[i].x == -1) {
-                nausjugadors.splice(i, 1);
+    //Prier comprovem que una nau no s'hagi eliminat
+    for (let i = 0; i < 6; ++i) {
+        if (cercaNauSVG(i + 1)) {
+            if (nausjugadors[i] == undefined) {
+                $("#nau" + (i + 1)).remove();
                 continue;
-            }
-            if (!moureNau(nausjugadors[i].x, nausjugadors[i].y, nausjugadors[i].njugador, nausjugadors[i].rotacio)){
-                afegirNau(nausjugadors[i].x, nausjugadors[i].y, nausjugadors[i].njugador, nausjugadors[i].rotacio);
             }
         }
     }
+    for (let i = 0; i < nausjugadors.length; i++) {
+        if (nausjugadors[i] != null) {
+            if (nausjugadors[i].njugador != nau.njugador) {
+                if (nausjugadors[i].x == -1) {
+                    nausjugadors.splice(i, 1);
+                    continue;
+                }
+                if (!moureNau(nausjugadors[i].x, nausjugadors[i].y, nausjugadors[i].njugador, nausjugadors[i].rotacio)){
+                    afegirNau(nausjugadors[i].x, nausjugadors[i].y, nausjugadors[i].njugador, nausjugadors[i].rotacio);
+                }
+            }
+        }
+    }
+
+}
+
+function cercaNauSVG(njugador){
+    return document.getElementById("nau" + njugador) ? true : false;
 }
