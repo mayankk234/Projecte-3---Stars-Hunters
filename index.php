@@ -1,3 +1,3 @@
 <?php
-require 'View/index.vista.php';
+require('View/index.vista.php')
 ?>

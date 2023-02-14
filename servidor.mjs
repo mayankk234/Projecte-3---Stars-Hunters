@@ -9,6 +9,8 @@ var jugadors = new Array();
 var jugador = new Array();
 var naus = new Array();
 
+var estrelles = new Array();
+
 var controlador = new Array();
 
 jugadors[0] = false;
@@ -62,6 +64,12 @@ wsServer.on("connection", (client, peticio) => {
             } else {
                 client.send("Ja hi ha 6 jugadors");
             }
+        } else if (missatge == "start") {
+                wsServer.clients.forEach((client) => {
+                    if (client.readyState === WebSocket.OPEN) {
+                        client.send("start");
+                    }
+                });
         } else if (typeof missatge == "object") {
             //Saber quin jugador ha enviat la nau
             let index = jugador.indexOf(id);

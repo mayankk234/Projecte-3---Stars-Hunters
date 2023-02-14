@@ -29,20 +29,27 @@ function init(){
         if (missatge.data <= 6) {
             nau = new Nau(missatge.data);
             nausjugadors[nau.njugador - 1] = nau;
+            console.log("Jugador " + missatge.data);
+            connexio.send(JSON.stringify(nau));
+        //Si el missatge es un objecte, es tracta d'una nau
+        } else if (missatge.data == "start"){
             mourenau = setInterval(function () {
                 if (nau.moure()) {
                     connexio.send(JSON.stringify(nau));
                 }         
             }, 1000 / 60);
-            console.log("Jugador " + missatge.data);
-            connexio.send(JSON.stringify(nau));
-        //Si el missatge es un objecte, es tracta d'una nau
         } else if (typeof missatge == "object") {
-            let naujugador = JSON.parse(missatge.data);
-            for(let i = 0; i < naujugador.length; i++){
-                nausjugadors[i] = naujugador[i];
+            let objecte = JSON.parse(missatge.data);
+            if (objecte[0].njugador == undefined) {
+                let estrelles = objecte;
+                actualitzarposicionsEstrelles(estrelles);
+            } else {
+                let naujugador = objecte;
+                for(let i = 0; i < naujugador.length; i++){
+                    nausjugadors[i] = naujugador[i];
+                }
+                actualitzarposicionsNaus();
             }
-            actualitzarposicions();
         }
         
     };
@@ -60,7 +67,7 @@ $(document).ready(function() {
     init();
 });
 
-function actualitzarposicions(){
+function actualitzarposicionsNaus(){
     //Prier comprovem que una nau no s'hagi eliminat
     for (let i = 0; i < 6; ++i) {
         if (cercaNauSVG(i + 1)) {
@@ -88,4 +95,12 @@ function actualitzarposicions(){
 
 function cercaNauSVG(njugador){
     return document.getElementById("nau" + njugador) ? true : false;
+}
+
+function actualitzarposicionsEstrelles(){
+    for (let i = 0; i < estrelles.length; i++) {
+        if (!moureEstrella(estrelles[i].x, estrelles[i].y,estrelles[i].id)) {
+            afegirEstrella(estrelles[i].x, estrelles[i].y, estrelles[i].id);
+        }
+    }
 }
