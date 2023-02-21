@@ -2,7 +2,10 @@
 //CLIENTS FUNCIONS
 /****************************************/
 import { Nau, afegirNau, moureNau } from './nau.js';
+import { moureEstrella, afegirEstrella } from '../../../Controller/estrella.js';
 var nausjugadors = new Array();
+
+var estrelles;
 
 var nau;
 
@@ -33,15 +36,19 @@ function init(){
             connexio.send(JSON.stringify(nau));
         //Si el missatge es un objecte, es tracta d'una nau
         } else if (missatge.data == "start"){
+            alert("El joc ha començat");
             mourenau = setInterval(function () {
                 if (nau.moure()) {
                     connexio.send(JSON.stringify(nau));
+                    colisioNauEstrella(nau);
                 }         
             }, 1000 / 60);
+        } else if (missatge.data == "no"){
+            console.log("S'esta a a espera a que el servidor comenci el joc");
         } else if (typeof missatge == "object") {
             let objecte = JSON.parse(missatge.data);
             if (objecte[0].njugador == undefined) {
-                let estrelles = objecte;
+                estrelles = objecte;
                 actualitzarposicionsEstrelles(estrelles);
             } else {
                 let naujugador = objecte;
@@ -97,10 +104,27 @@ function cercaNauSVG(njugador){
     return document.getElementById("nau" + njugador) ? true : false;
 }
 
-function actualitzarposicionsEstrelles(){
+function actualitzarposicionsEstrelles(estrelles){
+    for (let i = 0; i < document.getElementById("joc").children.length; i++) {
+        if (document.getElementById("joc").children[i].id.includes("estrella")) {
+            let estrellaSVG = document.getElementById("joc").children[i];
+            if (estrelles.find(estrella => estrella.id == estrellaSVG.id) == undefined) {
+                estrellaSVG.remove();
+            }
+        }
+    }
     for (let i = 0; i < estrelles.length; i++) {
         if (!moureEstrella(estrelles[i].x, estrelles[i].y,estrelles[i].id)) {
             afegirEstrella(estrelles[i].x, estrelles[i].y, estrelles[i].id);
         }
     }
+}
+
+function colisioNauEstrella(nau){
+    for (let estrella of estrelles) {
+        if (nau.x + 40 >= estrella.x && nau.x <= estrella.x + 40 && nau.y + 40 >= estrella.y && nau.y <= estrella.y + 40) {
+            return estrella.id;
+        }
+    }
+    return undefined;
 }

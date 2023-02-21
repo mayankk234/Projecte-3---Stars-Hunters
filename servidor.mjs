@@ -9,9 +9,15 @@ var jugadors = new Array();
 var jugador = new Array();
 var naus = new Array();
 
+var x = 440, y = 660;
+
 var estrelles = new Array();
+var intervalEstrelles;
+var comptadorEstrelles = 0;
 
 var controlador = new Array();
+
+var jocComencat = false;
 
 jugadors[0] = false;
 jugadors[1] = false;
@@ -40,36 +46,72 @@ wsServer.on("connection", (client, peticio) => {
                     client.send("1");
                     jugadors[0] = true;
                     jugador[0] = id;
+                    client.send(jocComencat == false ? "no" : "start");
+                    if (estrelles.length > 0) {
+                        client.send(JSON.stringify(estrelles));
+                    }
                 } else if (!jugadors[1]) {
                     client.send("2");
                     jugadors[1] = true;
                     jugador[1] = id;
+                    client.send(jocComencat == false ? "no" : "start");
+                    if (estrelles.length > 0) {
+                        client.send(JSON.stringify(estrelles));
+                    }
                 } else if (!jugadors[2]) {
                     client.send("3");
                     jugadors[2] = true;
                     jugador[2] = id;
+                    client.send(jocComencat == false ? "no" : "start");
+                    if (estrelles.length > 0) {
+                        client.send(JSON.stringify(estrelles));
+                    }
                 } else if (!jugadors[3]) {
                     client.send("4");
                     jugadors[3] = true;
                     jugador[3] = id;
+                    client.send(jocComencat == false ? "no" : "start");
+                    if (estrelles.length > 0) {
+                        client.send(JSON.stringify(estrelles));
+                    }
                 } else if (!jugadors[4]) {
                     client.send("5");
                     jugadors[4] = true;
                     jugador[4] = id;
+                    client.send(jocComencat == false ? "no" : "start");
+                    if (estrelles.length > 0) {
+                        client.send(JSON.stringify(estrelles));
+                    }
                 } else if (!jugadors[5]) {
                     client.send("6");
                     jugadors[5] = true;
                     jugador[5] = id;
+                    client.send(jocComencat == false ? "no" : "start");
+                    if (estrelles.length > 0) {
+                        client.send(JSON.stringify(estrelles));
+                    }
                 }
             } else {
                 client.send("Ja hi ha 6 jugadors");
             }
         } else if (missatge == "start") {
+            if (jocComencat == false) {
                 wsServer.clients.forEach((client) => {
                     if (client.readyState === WebSocket.OPEN) {
                         client.send("start");
                     }
                 });
+                jocComencat = true;
+                intervalEstrelles = setInterval(() => {
+                    estrelles.push({x: Math.random() * x, y: Math.random() * y, id: "estrella" + comptadorEstrelles});
+                    comptadorEstrelles++;
+                    wsServer.clients.forEach((client) => {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify(estrelles));
+                        }
+                    });
+                }, 7500);
+            }
         } else if (typeof missatge == "object") {
             //Saber quin jugador ha enviat la nau
             let index = jugador.indexOf(id);
@@ -78,9 +120,7 @@ wsServer.on("connection", (client, peticio) => {
                 naus[index] = nau;
             }
             actPos();
-        }
-        console.log("Missatge rebut: " + missatge);
-        console.log("Jugadors: " + jugadors);});
+        };});
     client.on("close", () => {
         console.log("Client tancat");
         let index = jugador.indexOf(id);
