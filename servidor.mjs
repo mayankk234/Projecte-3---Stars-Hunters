@@ -122,20 +122,24 @@ wsServer.on("connection", (client, peticio) => {
             }
         } else if (typeof missatge == "object") {
             let estrella = JSON.parse(missatge);
-            if (estrella[0] != undefined  && estrella[0].accio == "eliminar") {
+            if (estrella != undefined  && estrella.accio == "eliminar") {
                 if (estrella.accio.includes("eliminar")) {
-                let estrellaId = parseInt(estrella.id.replace("estrella", ""));
+                let estrellaId = estrella.id;
                 let index = estrelles.findIndex(estrella => estrella.id == estrellaId);
-                estrelles.splice(index, 1);
-                let accioEstrelles = {accio: "eliminar", id: estrellaId};
-                let indexJugador = jugador.indexOf(id);
-                puntuacions[indexJugador]++;
-                wsServer.clients.forEach((client) => {
-                    if (client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify(accioEstrelles));
-                        // client.send(JSON.stringify(puntuacions));
-                    }
-                });
+                if(index > -1){
+                    estrelles.splice(index, 1);
+                    let accioEstrelles = {accio: "eliminar", id: estrellaId};
+                    let indexJugador = jugador.indexOf(id);
+                    puntuacions[indexJugador]++;
+                    comprovarPuntuacions();
+                    let accioPuntuacions = {accio: "puntuacions", puntuacions: puntuacions};
+                    wsServer.clients.forEach((client) => {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify(accioEstrelles));
+                            client.send(JSON.stringify(accioPuntuacions));
+                        }
+                    });
+                }
             }
             }else {
             //Saber quin jugador ha enviat la nau
@@ -189,4 +193,28 @@ function actPos() {
         }
     });
     return;
+}
+
+
+function comprovarPuntuacions(){
+    //Si una puntació és 10, s'acaba el joc i es reinicia tot
+    for (let i = 0; i < puntuacions.length; i++) {
+        if (puntuacions[i] == 10) {
+            clearInterval(intervalEstrelles);
+            estrelles = [];
+            jocComencat = false;
+            naus = [];
+            jugador = [];
+            x = 440;
+            y = 660;
+            comptadorEstrelles = 0;
+            puntuacions = [0, 0, 0, 0, 0, 0];
+            let accio = {accio: "reiniciar", guanyador: i + 1};
+            wsServer.clients.forEach((client) => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send("reiniciar");
+                }
+            });
+        }
+    }
 }

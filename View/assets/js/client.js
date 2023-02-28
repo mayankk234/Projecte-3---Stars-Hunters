@@ -36,6 +36,11 @@ function init(){
             connexio.send(JSON.stringify(nau));
         //Si el missatge es un objecte, es tracta d'una nau
         } else if (missatge.data == "start"){
+            for (let i = 0; i < nausjugadors.length; i++) {
+                if (nausjugadors[i] != undefined) {
+                    afegirPuntuacio(nausjugadors[i].njugador);
+                }
+            }
             alert("El joc ha començat");
             mourenau = setInterval(function () {
                 if (nau.moure()) {
@@ -62,9 +67,14 @@ function init(){
                 }
                 actualitzarposicionsNaus();
             } else {
-                if (objecte[0] != undefined && objecte[0].accio != undefined) {
-                    if (objecte[0].accio == "eliminar") {
+                if (objecte != undefined && objecte.accio != undefined) {
+                    if (objecte.accio == "eliminar") {
                         eliminarEstrella(objecte);
+                    } else if (objecte.accio == "puntuacions"){
+                        actualitzarPuntuacions(objecte);
+                    } else if (objecte.accio == "reiniciar"){
+                        alert("El jugador " + objecte.guanyador + " ha guanyat");
+                        clearInterval(mourenau);
                     }
                 } else if (objecte[0] != undefined && objecte[0].x != undefined) {
                     estrelles = objecte;
@@ -114,6 +124,30 @@ function actualitzarposicionsNaus(){
 
 }
 
+function afegirPuntuacio(njugador){
+    let puntuacions = $("#Puntuacions");
+    let row = document.createElement("div");
+    row.setAttribute("class", "row");
+
+    let col = document.createElement("div");
+    col.setAttribute("class", "col-12");
+
+    let puntuacio = document.createElement("p");
+    puntuacio.setAttribute("id", "puntuacio" + njugador);
+    puntuacio.innerHTML = "Jugador " + njugador + ": 0";
+
+    col.appendChild(puntuacio);
+    row.appendChild(col);
+    puntuacions.append(row);
+}
+
+function actualitzarPuntuacions(puntuacions){
+    for (let i = 0; i < puntuacions.puntuacions.length; i++) {
+        $("#puntuacio" + (i + 1)).html("Jugador " + (i + 1) + ": " + puntuacions.puntuacions[i]);
+    }
+}
+
+
 function cercaNauSVG(njugador){
     return document.getElementById("nau" + njugador) ? true : false;
 }
@@ -137,7 +171,7 @@ function cercaEstrellaSVG(id){
 }
 
 function eliminarEstrella(accioEstrelles){
-    let estrellaIdEliminar = accioEstrelles[0].id;
+    let estrellaIdEliminar = accioEstrelles.id;
     for (let i = 0; i < document.getElementById("joc").children.length; i++) {
         if (document.getElementById("joc").children[i].id.includes("estrella")) {
             let estrellaSVG = document.getElementById("joc").children[i];
