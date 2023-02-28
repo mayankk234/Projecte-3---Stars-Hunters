@@ -210,8 +210,6 @@ function comprovarPuntuacions(){
             clearInterval(intervalEstrelles);
             estrelles = [];
             jocComencat = false;
-            naus = [];
-            jugador = [];
             x = 440;
             y = 660;
             comptadorEstrelles = 0;
