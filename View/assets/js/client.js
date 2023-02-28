@@ -74,7 +74,7 @@ function init(){
                         actualitzarPuntuacions(objecte);
                     } else if (objecte.accio == "reiniciar"){
                         alert("El jugador " + objecte.guanyador + " ha guanyat");
-                        clearInterval(mourenau);
+                        location.reload();
                     }
                 } else if (objecte[0] != undefined && objecte[0].x != undefined) {
                     estrelles = objecte;
@@ -191,7 +191,7 @@ function colisioNauEstrella(nau){
         let distanciaX = nau.x - estrella.x;
         let distanciaY = nau.y - estrella.y;
         let distancia = Math.sqrt(distanciaX * distanciaX + distanciaY * distanciaY);
-        if (distancia < 20) {
+        if (distancia < 40) {
             console.log("Nau x: " + nau.x + " Nau y: " + nau.y + " Estrella x: " + estrella.x + " Estrella y: " + estrella.y + " Distancia: " + distancia + "");
             return estrella.id;
         }

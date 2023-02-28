@@ -109,6 +109,13 @@ wsServer.on("connection", (client, peticio) => {
                         client.send("start");
                     }
                 });
+                    estrelles.push({x: Math.round(Math.random() * x), y: Math.round(Math.random() * y), id: "estrella" + comptadorEstrelles});
+                    comptadorEstrelles++;
+                    wsServer.clients.forEach((client) => {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify(estrelles));
+                        }
+                    });
                 jocComencat = true;
                 intervalEstrelles = setInterval(() => {
                     estrelles.push({x: Math.round(Math.random() * x), y: Math.round(Math.random() * y), id: "estrella" + comptadorEstrelles});
@@ -212,7 +219,7 @@ function comprovarPuntuacions(){
             let accio = {accio: "reiniciar", guanyador: i + 1};
             wsServer.clients.forEach((client) => {
                 if (client.readyState === WebSocket.OPEN) {
-                    client.send("reiniciar");
+                    client.send(JSON.stringify(accio));
                 }
             });
         }
