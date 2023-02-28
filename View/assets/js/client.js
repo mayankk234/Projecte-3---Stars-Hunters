@@ -40,24 +40,38 @@ function init(){
             mourenau = setInterval(function () {
                 if (nau.moure()) {
                     connexio.send(JSON.stringify(nau));
-                    colisioNauEstrella(nau);
+                    let estrellaColisio = colisioNauEstrella(nau);
+                    if (estrellaColisio != undefined) {
+                        //Fem array per enviar a servidor
+                        estrellaColisio = {
+                            "accio": "eliminar",
+                            "id": estrellaColisio
+                        }
+                        connexio.send(JSON.stringify(estrellaColisio));
+                    }
                 }         
             }, 1000 / 60);
         } else if (missatge.data == "no"){
             console.log("S'esta a a espera a que el servidor comenci el joc");
         } else if (typeof missatge == "object") {
             let objecte = JSON.parse(missatge.data);
-            if (objecte[0].njugador == undefined) {
-                estrelles = objecte;
-                actualitzarposicionsEstrelles(estrelles);
-            } else {
+            if (objecte[0] != undefined && objecte[0].njugador != undefined) {
                 let naujugador = objecte;
                 for(let i = 0; i < naujugador.length; i++){
                     nausjugadors[i] = naujugador[i];
                 }
                 actualitzarposicionsNaus();
+            } else {
+                if (objecte[0] != undefined && objecte[0].accio != undefined) {
+                    if (objecte[0].accio == "eliminar") {
+                        eliminarEstrella(objecte);
+                    }
+                } else if (objecte[0] != undefined && objecte[0].x != undefined) {
+                    estrelles = objecte;
+                    actualitzarposicionsEstrelles(estrelles);
             }
         }
+    }
         
     };
     connexio.onclose = function () {
@@ -105,24 +119,46 @@ function cercaNauSVG(njugador){
 }
 
 function actualitzarposicionsEstrelles(estrelles){
+    for (let i = 0; i < estrelles.length; i++) {
+        //Si es troba la estrella al SVG pero a l'array no, esborrem la estrella del SVG
+        if (cercaEstrellaSVG(estrelles[i].id)) {
+            if (estrelles[i].x == -1) {
+                document.getElementById(estrelles[i].id).remove();
+                continue;
+            }
+        } else {
+            afegirEstrella(estrelles[i].x, estrelles[i].y, estrelles[i].id);
+        }
+    }
+}
+
+function cercaEstrellaSVG(id){
+    return document.getElementById(id) ? true : false;
+}
+
+function eliminarEstrella(accioEstrelles){
+    let estrellaIdEliminar = accioEstrelles[0].id;
     for (let i = 0; i < document.getElementById("joc").children.length; i++) {
         if (document.getElementById("joc").children[i].id.includes("estrella")) {
             let estrellaSVG = document.getElementById("joc").children[i];
-            if (estrelles.find(estrella => estrella.id == estrellaSVG.id) == undefined) {
+            if (estrellaSVG.id == estrellaIdEliminar) {
                 estrellaSVG.remove();
+                estrelles.splice(i, 1);
             }
-        }
-    }
-    for (let i = 0; i < estrelles.length; i++) {
-        if (!moureEstrella(estrelles[i].x, estrelles[i].y,estrelles[i].id)) {
-            afegirEstrella(estrelles[i].x, estrelles[i].y, estrelles[i].id);
         }
     }
 }
 
 function colisioNauEstrella(nau){
     for (let estrella of estrelles) {
-        if (nau.x + 40 >= estrella.x && nau.x <= estrella.x + 40 && nau.y + 40 >= estrella.y && nau.y <= estrella.y + 40) {
+        // if (nau.x + 20 >= estrella.x && nau.x <= estrella.x + 20 && nau.y + 20 >= estrella.y && nau.y <= estrella.y + 20) {
+        //     return estrella.id;
+        // }
+        let distanciaX = nau.x - estrella.x;
+        let distanciaY = nau.y - estrella.y;
+        let distancia = Math.sqrt(distanciaX * distanciaX + distanciaY * distanciaY);
+        if (distancia < 20) {
+            console.log("Nau x: " + nau.x + " Nau y: " + nau.y + " Estrella x: " + estrella.x + " Estrella y: " + estrella.y + " Distancia: " + distancia + "");
             return estrella.id;
         }
     }

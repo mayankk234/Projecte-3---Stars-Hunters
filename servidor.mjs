@@ -5,6 +5,7 @@ import WebSocket, {WebSocketServer} from "ws";
 
 const wsServer = new WebSocketServer({port: 8180});
 
+var puntuacions = new Array();
 var jugadors = new Array();
 var jugador = new Array();
 var naus = new Array();
@@ -25,6 +26,13 @@ jugadors[2] = false;
 jugadors[3] = false;
 jugadors[4] = false;
 jugadors[5] = false;
+
+puntuacions[0] = 0;
+puntuacions[1] = 0;
+puntuacions[2] = 0;
+puntuacions[3] = 0;
+puntuacions[4] = 0;
+puntuacions[5] = 0;
 
 // 
 
@@ -103,7 +111,7 @@ wsServer.on("connection", (client, peticio) => {
                 });
                 jocComencat = true;
                 intervalEstrelles = setInterval(() => {
-                    estrelles.push({x: Math.random() * x, y: Math.random() * y, id: "estrella" + comptadorEstrelles});
+                    estrelles.push({x: Math.round(Math.random() * x), y: Math.round(Math.random() * y), id: "estrella" + comptadorEstrelles});
                     comptadorEstrelles++;
                     wsServer.clients.forEach((client) => {
                         if (client.readyState === WebSocket.OPEN) {
@@ -113,6 +121,23 @@ wsServer.on("connection", (client, peticio) => {
                 }, 7500);
             }
         } else if (typeof missatge == "object") {
+            let estrella = JSON.parse(missatge);
+            if (estrella[0] != undefined  && estrella[0].accio == "eliminar") {
+                if (estrella.accio.includes("eliminar")) {
+                let estrellaId = parseInt(estrella.id.replace("estrella", ""));
+                let index = estrelles.findIndex(estrella => estrella.id == estrellaId);
+                estrelles.splice(index, 1);
+                let accioEstrelles = {accio: "eliminar", id: estrellaId};
+                let indexJugador = jugador.indexOf(id);
+                puntuacions[indexJugador]++;
+                wsServer.clients.forEach((client) => {
+                    if (client.readyState === WebSocket.OPEN) {
+                        client.send(JSON.stringify(accioEstrelles));
+                        // client.send(JSON.stringify(puntuacions));
+                    }
+                });
+            }
+            }else {
             //Saber quin jugador ha enviat la nau
             let index = jugador.indexOf(id);
             let nau = JSON.parse(missatge);
@@ -120,7 +145,7 @@ wsServer.on("connection", (client, peticio) => {
                 naus[index] = nau;
             }
             actPos();
-        };});
+        }};});
     client.on("close", () => {
         console.log("Client tancat");
         let index = jugador.indexOf(id);
@@ -143,6 +168,17 @@ wsServer.on("connection", (client, peticio) => {
         if (index > -1) {
             controlador.splice(index, 1);
         }
+        //Si no hi ha cap connexió, es torna a posar tot a 0
+        if (wsServer.clients.size == 0) {
+            clearInterval(intervalEstrelles);
+            estrelles = [];
+            jocComencat = false;
+            naus = [];
+            jugador = [];
+            x = 440;
+            y = 660;
+            comptadorEstrelles = 0;
+        }
     });
 });
 
@@ -154,5 +190,3 @@ function actPos() {
     });
     return;
 }
-
-var actualitzarPosicions;
