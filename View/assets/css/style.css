@@ -14,3 +14,10 @@ svg {
     height: 40px;
 
 }
+
+#Puntuacions {
+    text-align: center;
+    margin-top: 2px;
+    font-size: 30px;
+    margin-bottom: -200px;
+}
